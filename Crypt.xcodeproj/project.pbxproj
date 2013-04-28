@@ -152,7 +152,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = FV;
-				LastUpgradeCheck = 0450;
+				LastUpgradeCheck = 0460;
 				ORGANIZATIONNAME = "Graham Gilbert";
 			};
 			buildConfigurationList = FC54DB5F1646E4FE00737F94 /* Build configuration list for PBXProject "Crypt" */;
@@ -286,6 +286,7 @@
 		FC54DB871646E4FE00737F94 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Crypt/Crypt-Prefix.pch";
 				INFOPLIST_FILE = "Crypt/Crypt-Info.plist";
@@ -298,6 +299,7 @@
 		FC54DB881646E4FE00737F94 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Crypt/Crypt-Prefix.pch";
 				INFOPLIST_FILE = "Crypt/Crypt-Info.plist";

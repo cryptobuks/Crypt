@@ -5,7 +5,7 @@
 #
 #  Created by Graham Gilbert on 03/12/2012.
 #
-# Copyright 2012 Graham Gilbert.
+# Copyright 2013 Graham Gilbert.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -154,12 +154,10 @@ def escrowKey(key, username, runtype):
             print 'We failed to reach a server.'
             print 'Reason: ', e.reason
             has_error = True
-        #NSApp.terminate_(self)
         elif hasattr(e, 'code'):
             print 'The server couldn\'t fulfill the request'
             print 'Error code: ', e.code
             has_error = True
-            #NSApp.terminate_(self)
             if has_error:
                 plistData = {}
                 plistData['recovery_key']=key
@@ -172,7 +170,7 @@ def escrowKey(key, username, runtype):
                     reboot = subprocess.Popen(the_command,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).communicate()[0]
     
     else:
-        ##need some code to read in the json response from the server, and if the deta matches, display success message, or failiure message, then reboot. If not, we need to cache it on disk somewhere - maybe pull it out with facter?
+        ##need some code to read in the json response from the server, and if the data matches, display success message, or failiure message, then reboot. If not, we need to cache it on disk somewhere - maybe pull it out with facter?
         #time to turn on filevault
         #NSLog(u"%s" % fvprefs['ServerURL'])
         ##escrow successful, if the file exists, remove it
