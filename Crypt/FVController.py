@@ -42,6 +42,8 @@ class FVController(NSObject):
     encryptButton = objc.IBOutlet()
     errorField = objc.IBOutlet()
     window = objc.IBOutlet()
+    progressPanel = objc.IBOutlet()
+    progressIndicator = objc.IBOutlet()
     
     
     def startRun(self):
@@ -54,9 +56,7 @@ class FVController(NSObject):
     @objc.IBAction
     def encrypt_(self,sender):
         fvprefspath = "/Library/Preferences/FVServer.plist"
-        the_command = "ioreg -c \"IOPlatformExpertDevice\" | awk -F '\"' '/IOPlatformSerialNumber/ {print $4}'"
-        serial = subprocess.Popen(the_command,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).communicate()[0]
-        serial = re.sub(r'\s', '', serial)
+        serial = FVUtils.GetMacSerial()
         serverURL = FVUtils.pref("ServerURL")
         NSLog(u"%s" % serverURL)
         if serverURL == "":
