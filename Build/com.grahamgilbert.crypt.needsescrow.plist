@@ -6,7 +6,7 @@
 	<string>com.grahamgilbert.crypt.needsescrow</string>
 	<key>ProgramArguments</key>
 	<array>
-		<string>/usr/local/fvserver/delayed_escrow</string>
+		<string>/usr/local/crypt/delayed_escrow</string>
 	</array>
 	<key>RunAtLoad</key>
 	<true/>
