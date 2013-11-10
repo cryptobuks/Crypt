@@ -1,12 +1,18 @@
 #Crypt
 Crypt is a system for centrally storing FilveVault 2 recovery keys. It is made up of a client app, and a Django web app for storing the keys. You will also need to [download and install the webapp](https://github.com/grahamgilbert/Crypt-Server).
 
+##Changes in this version
+* 10.7 is no longer supported.
+* Improved logging on errors.
+* Improved user feedback during long operations (such as enabling FileVault).
+
 ##Client
-The client is written in Pyobjc, and makes use of Google's csfde from Cauliflower Vest to handle the actual encryption on OS X 10.7 and the built in fdesetup on OS X 10.8. An example login hook is provided to see how this could be implemented in your organisation. 
+The client is written in Pyobjc, and makes use of  the built in fdesetup on OS X 10.8 and higher. An example login hook is provided to see how this could be implemented in your organisation. 
 
 ###Features
 - If escrow fails for some reason, the recovery key is stored on disk and a Launch Daemon will attempt to escrow the key periodically.
-- If the app cannot contact the server, it will quit
+- If the app cannot contact the server, it will quit.
+- If FileVault is already enabled, the app will quit.
 
 ###Screenshot
 ![Crypt Screenshot](https://raw.github.com/grahamgilbert/Crypt/master/Screenshot.png)
@@ -19,4 +25,4 @@ The client is written in Pyobjc, and makes use of Google's csfde from Cauliflowe
 ``sudo defaults write /Library/Preferences/FVServer ServerURL "http://yourserver.com"``
 
 ##Acknowledgements
-Many thanks to my lovely employers at [pebble.it](http://pebbleit.com) for letting me release this, thanks to Google for releasing [csfde](http://code.google.com/p/cauliflowervest/), and thanks to Greg Neagle and the other contributors at [Munki](http://code.google.com/p/munki/) for having code that I could borrow.
+Many thanks to my lovely employers at [pebble.it](http://pebbleit.com) for letting me release this, and thanks to Greg Neagle and the other contributors at [Munki](http://code.google.com/p/munki/) for having code that I could borrow.

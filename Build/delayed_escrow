@@ -5,7 +5,7 @@ import os
 currentDir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(currentDir+'/Crypt.app/Contents/Resources')
 
-import FVUtils
+import FVController
 import FoundationPlist
 
 thePlist = '/usr/local/crypt/recovery_key.plist'
@@ -22,4 +22,4 @@ userName = recoveryData['username']
 
 ##escrow the key
 
-escrow = FVUtils.escrowKey(recoveryKey, userName, "delayed")
+escrow = FVUtils.escrow_key(recoveryKey, userName, "delayed")

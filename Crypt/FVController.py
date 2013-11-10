@@ -44,6 +44,7 @@ class FVController(NSObject):
     window = objc.IBOutlet()
     progressPanel = objc.IBOutlet()
     progressIndicator = objc.IBOutlet()
+    progressText = objc.IBOutlet()
     
     
     def startRun(self):
@@ -51,7 +52,98 @@ class FVController(NSObject):
             self.window.setCanBecomeVisibleWithoutLogin_(True)
             self.window.setLevel_(NSScreenSaverWindowLevel - 1)
             self.window.center()
+            
+    def runEncryptOnThread_(self, input_plist):
+        # Autorelease pool for memory management
+        pool = NSAutoreleasePool.alloc().init()
+        the_error = None
+        fv_status = ""
+        recovery_key = None
+        plist = plistlib.readPlistFromString(input_plist)
+        user_name = plist['Username']
+        # run command
+        p = subprocess.Popen(['/usr/bin/fdesetup','enable','-outputplist', '-inputplist'], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+        (stdout_data, err) = p.communicate(input=input_plist)
+        try:
+            fv_status = plistlib.readPlistFromString(stdout_data)
+            recovery_key = fv_status['RecoveryKey']
+        except:
+            NSLog('Couldn\'t read recovery key from output')
+        if p.returncode != 0:
+            NSLog('ERROR: %s' % err)
+            the_error = err
+            
+        self.performSelectorOnMainThread_withObject_waitUntilDone_(self.encryptionComplete(user_name, recovery_key, the_error), None, YES)
+        # Clean up autorelease pool
+        del pool
+
+        
+    def encryptionComplete(self, user_name, recovery_key, encrypt_error):
+        # end the modal sheet and close the panel
+        NSApp.endSheet_(self.progressPanel)
+        self.progressPanel.orderOut_(self)
+        def enable_inputs(self):
+            self.userName.setEnabled_(True)
+            self.password.setEnabled_(True)
+            self.encryptButton.setEnabled_(True)
+        # send the key to be escrowed if not an error
+        if encrypt_error:
+            ##write the key to a plist
+            ##load a launch daemon - touch a file maybe?
+            ##submit the key
+            alert = NSAlert.alertWithMessageText_defaultButton_alternateButton_otherButton_informativeTextWithFormat_(
+                                                                                                                      NSLocalizedString(u"Something went wrong", None),
+                                                                                                                      NSLocalizedString(u"Aww, drat", None),
+                                                                                                                      objc.nil,
+                                                                                                                      objc.nil,
+                                                                                                                      NSLocalizedString(u"There was a problem with enabling encryption on your Mac. Please make sure you are using your short username and that your password is correct. Please contact IT Support if you need help.", None))
+            alert.beginSheetModalForWindow_modalDelegate_didEndSelector_contextInfo_(
+                                                                                         self.window, self, enable_inputs(self), objc.nil)
+        if recovery_key:
+            self.escrowKey(recovery_key, user_name, 'initial')
+
+    def encryptDrive(self, password, username):
+        #time to turn on filevault
+        # we need to see if fdesetup is available, might as well use the built in methods in 10.8
+        the_error = ""
+        fv_status = ""
+        if os.path.exists('/usr/bin/fdesetup'):
+            ##build plist
+            the_settings = {}
+            the_settings['Username'] = username
+            the_settings['Password'] = password
+            input_plist = plistlib.writePlistToString(the_settings)
+            NSThread.detachNewThreadSelector_toTarget_withObject_(self.runEncryptOnThread_, self, input_plist)
+            
+        if not os.path.exists('/usr/bin/fdesetup'):
+            return fv_status, the_error
+
+    def escrowKey(self, key, username, runtype):
+        #self.progressText.setStringValue_("Sending encryption key to the server...")
+        if runtype == 'initial':
+            NSApp.beginSheet_modalForWindow_modalDelegate_didEndSelector_contextInfo_(self.progressPanel, self.window, self, None, None)
+            self.progressIndicator.startAnimation_(self)
+        ##submit this to the server fv_status['recovery_password']
+        FVUtils.escrow_key(key, username, runtype)
     
+    def errorReset(self):
+        # Hide the progress bar
+        NSApp.endSheet_(self.progressPanel)
+        self.progressPanel.orderOut_(self)
+        def enable_inputs(self):
+            self.userName.setEnabled_(True)
+            self.password.setEnabled_(True)
+            self.encryptButton.setEnabled_(True)
+        # Show an error panel
+        alert = NSAlert.alertWithMessageText_defaultButton_alternateButton_otherButton_informativeTextWithFormat_(
+                                                                                                                  NSLocalizedString(u"Something went wrong", None),
+                                                                                                                  NSLocalizedString(u"Aww, drat", None),
+                                                                                                                  objc.nil,
+                                                                                                                  objc.nil,
+                                                                                                                  NSLocalizedString(u"There was a problem with enabling encryption on your Mac. Please make sure you are using your short username and that your password is correct. Please contact IT Support if you need help.", None))
+        alert.beginSheetModalForWindow_modalDelegate_didEndSelector_contextInfo_(
+                                                                                     self.window, self, enable_inputs(self), objc.nil)
+        
     
     @objc.IBAction
     def encrypt_(self,sender):
@@ -86,20 +178,7 @@ class FVController(NSObject):
             self.password.setEnabled_(False)
             self.encryptButton.setEnabled_(False)
             
-            #NSLog(u"csfde results: %s" % fv_status)
-            recovery_key, encrypt_error = FVUtils.encryptDrive(password_value, username_value)
-            if encrypt_error:
-                NSLog(u"%s" % encrypt_error)
-                ##write the key to a plist
-                ##load a launch daemon - touch a file maybe?
-                ##submit the key
-                alert = NSAlert.alertWithMessageText_defaultButton_alternateButton_otherButton_informativeTextWithFormat_(
-                                                                                                                          NSLocalizedString(u"Something went wrong", None),
-                                                                                                                          NSLocalizedString(u"Aww, drat", None),
-                                                                                                                          objc.nil,
-                                                                                                                          objc.nil,
-                                                                                                                          NSLocalizedString(u"There was a problem with enabling encryption on your Mac. Please take sure your are using your short username and that your password is correct. Please contact IT Support if you need help.", None))
-                alert.beginSheetModalForWindow_modalDelegate_didEndSelector_contextInfo_(
-                                                                                             self.window, self, enable_inputs(self), objc.nil)
-            if recovery_key:
-                FVUtils.escrowKey(recovery_key, username_value, 'initial')
+            # Open the progress sheet
+            NSApp.beginSheet_modalForWindow_modalDelegate_didEndSelector_contextInfo_(self.progressPanel, self.window, self, None, None)
+            self.progressIndicator.startAnimation_(self)
+            self.encryptDrive(password_value, username_value)

@@ -33,5 +33,9 @@ class FVAppDelegate(NSObject):
         # Prevent automatic relaunching at login on Lion
         if NSApp.respondsToSelector_('disableRelaunchOnLogin'):
             NSApp.disableRelaunchOnLogin()
-        # if not FVUtils.internet_on():
-            # NSApp.terminate_(self)
+        # Quit if filevault is already enabled, encrypting or decrypting.
+        if FVUtils.filevaultStatus():
+            NSApp.terminate_(self)
+        # Quit if the server isn't available
+        if not FVUtils.internet_on():
+            NSApp.terminate_(self)

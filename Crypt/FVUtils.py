@@ -28,6 +28,7 @@ from Foundation import *
 from urllib2 import Request, urlopen, URLError, HTTPError
 import urllib
 from ctypes import *
+import AppKit
 from ctypes import util
 
 iokit = cdll.LoadLibrary(util.find_library('IOKit'))
@@ -81,8 +82,6 @@ def GetMacName():
     thename = thename.strip()
     return thename
 
-
-
 ##This was lifted verbatim from the Munki project - hope Greg doesn't mind!
 
 def set_pref(pref_name, pref_value):
@@ -122,49 +121,7 @@ def pref(pref_name):
         # convert NSDate/CFDates to strings
         pref_value = str(pref_value)
     return pref_value
-
-def encryptDrive(password,username):
-    #time to turn on filevault
-    # we need to see if fdesetup is available, might as well use the built in methods in 10.8
-    the_error = ""
-    fv_status = ""
-    if os.path.exists('/usr/bin/fdesetup'):
-        ##build plist
-        the_settings = {}
-        the_settings['Username'] = username
-        the_settings['Password'] = password
-        input_plist = plistlib.writePlistToString(the_settings)
-        try:
-            p = subprocess.Popen(['/usr/bin/fdesetup','enable','-outputplist', '-inputplist'], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout_data = p.communicate(input=input_plist)[0]
-            NSLog(u"%s" % stdout_data)
-            fv_status = plistlib.readPlistFromString(stdout_data)
-            return fv_status['RecoveryKey'], the_error
-        except:
-            return fv_status, "Couldn't enable FileVault on 10.8"
-            
-    if not os.path.exists('/usr/bin/fdesetup'):
-        try:
-            the_command = "/sbin/mount"
-            stdout = subprocess.Popen(the_command,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).communicate()[0]
-            for line in stdout.splitlines():
-                try:
-                    device, _, mount_point, _ = line.split(' ', 3)
-                    if mount_point == '/' and re.search(r'^[/a-z0-9]+$', device, re.I):
-                        the_disk = device
-                        break
-                except:
-                    NSLog(u"couldn't get boot disk")
-            #the_disk = FVUtils.GetRootDisk()
-            NSLog(u"%s" % the_disk)
-            the_command = "/usr/local/bin/csfde "+the_disk+" "+username+" "+password
-            stdout_data = subprocess.Popen(the_command,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).communicate()[0]
-            fv_status = plistlib.readPlistFromString(stdout_data)
-            NSLog(u"%s" % fv_status['recovery_password'])
-            return fv_status['recovery_password'], the_error
-        except:
-            return fv_status, "Couldn't enable FilveVault on 10.7"
-
+    
 def internet_on():
     try:
         response=urlopen(pref('ServerURL'),timeout=1)
@@ -174,8 +131,17 @@ def internet_on():
     NSLog(u"Server is not accessible")
     return False
 
-def escrowKey(key, username, runtype):
-    ##submit this to the server fv_status['recovery_password']
+def filevaultStatus():
+    p = subprocess.Popen(['/usr/bin/fdesetup','status'], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout_data = p.communicate()[0]
+    if stdout_data.strip() == "FileVault is Off.":
+        NSLog(u"FileVault is Off.")
+        return False
+    else:
+        NSLog(u"FileVault is Enabled.")
+        return True
+        
+def escrow_key(key, username, runtype):
     theurl = pref('ServerURL')+"/checkin/"
     serial = GetMacSerial()
     macname = GetMacName()
@@ -193,17 +159,21 @@ def escrowKey(key, username, runtype):
             print 'The server couldn\'t fulfill the request'
             print 'Error code: ', e.code
             has_error = True
-            if has_error:
-                plistData = {}
-                plistData['recovery_key']=key
-                plistData['username']=username
-                
+        if has_error:
+            plistData = {}
+            plistData['recovery_key']=key
+            plistData['username']=username
+            try:
                 FoundationPlist.writePlist(plistData, '/usr/local/crypt/recovery_key.plist')
-                os.chmod('/usr/local/crypt/recovery_key.plist',0700)
-                if runtype=="initial":
-                    the_command = "/sbin/reboot"
-                    reboot = subprocess.Popen(the_command,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).communicate()[0]
-    
+            except:
+                os.makedirs('/usr/local/crypt')
+                FoundationPlist.writePlist(plistData, '/usr/local/crypt/recovery_key.plist')
+            
+            os.chmod('/usr/local/crypt/recovery_key.plist',0700)
+            if runtype=="initial":
+                the_command = "/sbin/reboot"
+                reboot = subprocess.Popen(the_command,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).communicate()[0]
+
     else:
         ##need some code to read in the json response from the server, and if the data matches, display success message, or failiure message, then reboot. If not, we need to cache it on disk somewhere - maybe pull it out with facter?
         #time to turn on filevault
