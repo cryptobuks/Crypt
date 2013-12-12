@@ -8,7 +8,7 @@ sys.path.append(currentDir+'/Crypt.app/Contents/Resources')
 import FVController
 import FoundationPlist
 
-thePlist = '/usr/local/crypt/recovery_key.plist'
+thePlist = '/private/var/root/recovery_key.plist'
 
 if not os.path.exists(thePlist):
     print "file doesnt exist"

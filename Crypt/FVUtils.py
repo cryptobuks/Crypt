@@ -164,12 +164,12 @@ def escrow_key(key, username, runtype):
             plistData['recovery_key']=key
             plistData['username']=username
             try:
-                FoundationPlist.writePlist(plistData, '/usr/local/crypt/recovery_key.plist')
+                FoundationPlist.writePlist(plistData, '/private/var/root/recovery_key.plist')
             except:
                 os.makedirs('/usr/local/crypt')
-                FoundationPlist.writePlist(plistData, '/usr/local/crypt/recovery_key.plist')
+                FoundationPlist.writePlist(plistData, '/private/var/root/recovery_key.plist')
             
-            os.chmod('/usr/local/crypt/recovery_key.plist',0700)
+            os.chmod('/private/var/root/recovery_key.plist',0700)
             if runtype=="initial":
                 the_command = "/sbin/reboot"
                 reboot = subprocess.Popen(the_command,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).communicate()[0]
@@ -179,7 +179,7 @@ def escrow_key(key, username, runtype):
         #time to turn on filevault
         #NSLog(u"%s" % fvprefs['ServerURL'])
         ##escrow successful, if the file exists, remove it
-        thePlist = '/usr/local/crypt/recovery_key.plist'
+        thePlist = '/private/var/rootrecovery_key.plist'
 
         if os.path.exists(thePlist):
             os.remove(thePlist)
