@@ -70,9 +70,9 @@ def GetMacSerial():
                                                       kCFAllocatorDefault, 0);
             if serialNumberAsCFString:
                 SERIAL = cf.CFStringGetCStringPtr(serialNumberAsCFString, 0)
-           
+
             iokit.IOObjectRelease(platformExpert)
-   
+
     return SERIAL
 
 
@@ -109,6 +109,7 @@ def pref(pref_name):
     default_prefs = {
         'ServerURL': 'http://crypt',
         'CryptDir': '/usr/local/crypt',
+        'NetworkCheck': True,
     }
     pref_value = CFPreferencesCopyAppValue(pref_name, BUNDLE_ID)
     if pref_value == None:
@@ -121,15 +122,18 @@ def pref(pref_name):
         # convert NSDate/CFDates to strings
         pref_value = str(pref_value)
     return pref_value
-    
+
 def internet_on():
-    try:
-        response=urlopen(pref('ServerURL'),timeout=1)
-        NSLog(u"Server is accessible")
-        return True
-    except URLError as err: pass
-    NSLog(u"Server is not accessible")
-    return False
+    if pref('NetworkCheck'):
+      try:
+          response=urlopen(pref('ServerURL'),timeout=1)
+          NSLog(u"Server is accessible")
+          return True
+      except URLError as err: pass
+      NSLog(u"Server is not accessible")
+      return False
+    else:
+      return True
 
 def filevaultStatus():
     p = subprocess.Popen(['/usr/bin/fdesetup','status'], stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -140,7 +144,7 @@ def filevaultStatus():
     else:
         NSLog(u"FileVault is Enabled.")
         return True
-        
+
 def escrow_key(key, username, runtype):
     theurl = pref('ServerURL')+"/checkin/"
     serial = GetMacSerial()
@@ -168,7 +172,7 @@ def escrow_key(key, username, runtype):
             except:
                 os.makedirs('/usr/local/crypt')
                 FoundationPlist.writePlist(plistData, '/private/var/root/recovery_key.plist')
-            
+
             os.chmod('/private/var/root/recovery_key.plist',0700)
             if runtype=="initial":
                 the_command = "/sbin/reboot"

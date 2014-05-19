@@ -24,5 +24,8 @@ The client is written in Pyobjc, and makes use of  the built in fdesetup on OS X
 ###Configuration
 ``sudo defaults write /Library/Preferences/FVServer ServerURL "http://yourserver.com"``
 
+To disable the network check (for example, in environments when the network isn't available until the user has authenticated):
+``sudo defaults write /Library/Preferences/FVServer NetworkCheck -bool NO``
+
 ##Acknowledgements
 Many thanks to my lovely employers at [pebble.it](http://pebbleit.com) for letting me release this, and thanks to Greg Neagle and the other contributors at [Munki](http://code.google.com/p/munki/) for having code that I could borrow.

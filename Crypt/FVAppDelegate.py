@@ -28,7 +28,7 @@ class FVAppDelegate(NSObject):
     def applicationWillFinishLaunching_(self, sender):
         # don't show menu bar
         NSMenu.setMenuBarVisible_(NO)
-                
+
     def applicationDidFinishLaunching_(self, sender):
         # Prevent automatic relaunching at login on Lion
         if NSApp.respondsToSelector_('disableRelaunchOnLogin'):
