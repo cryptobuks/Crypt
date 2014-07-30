@@ -183,7 +183,7 @@ def escrow_key(key, username, runtype):
         #time to turn on filevault
         #NSLog(u"%s" % fvprefs['ServerURL'])
         ##escrow successful, if the file exists, remove it
-        thePlist = '/private/var/rootrecovery_key.plist'
+        thePlist = '/private/var/root/recovery_key.plist'
 
         if os.path.exists(thePlist):
             os.remove(thePlist)
