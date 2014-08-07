@@ -4,7 +4,7 @@ include /usr/local/share/luggage/luggage.make
 TITLE=Crypt_Client
 PACKAGE_NAME=Crypt_Client
 REVERSE_DOMAIN=com.grahamgilbert
-PACKAGE_VERSION=0.6
+PACKAGE_VERSION=0.7
 PAYLOAD=\
 			pack-crypt \
 			pack-Library-LaunchDaemons-com.grahamgilbert.crypt.needsescrow.plist
