@@ -7,6 +7,7 @@ sys.path.append(currentDir+'/Crypt.app/Contents/Resources')
 
 import FVController
 import FoundationPlist
+import FVUtils
 
 thePlist = '/private/var/root/recovery_key.plist'
 
