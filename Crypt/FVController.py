@@ -23,6 +23,7 @@
 import objc
 import FoundationPlist
 import os
+from SystemConfiguration import *
 from Foundation import *
 from AppKit import *
 from Cocoa import *
@@ -143,8 +144,12 @@ class FVController(NSObject):
                                                                                                                   NSLocalizedString(u"There was a problem with enabling encryption on your Mac. Please make sure you are using your short username and that your password is correct. Please contact IT Support if you need help.", None))
         alert.beginSheetModalForWindow_modalDelegate_didEndSelector_contextInfo_(
                                                                                      self.window, self, enable_inputs(self), objc.nil)
-        
-    
+
+    def awakeFromNib(self):
+        cur_console = SCDynamicStoreCopyConsoleUser(None, None, None)[0]
+        if cur_console != "":
+            self.userName.setStringValue_(cur_console)
+
     @objc.IBAction
     def encrypt_(self,sender):
         fvprefspath = "/Library/Preferences/FVServer.plist"
@@ -163,13 +168,11 @@ class FVController(NSObject):
         self.encryptButton.setEnabled_(False)
         
         def enable_inputs(self):
-            self.userName.setEnabled_(True)
             self.password.setEnabled_(True)
             self.encryptButton.setEnabled_(True)
     
         if username_value == "" or password_value == "":
             self.errorField.setStringValue_("You need to enter your username and password")
-            self.userName.setEnabled_(True)
             self.password.setEnabled_(True)
             self.encryptButton.setEnabled_(True)
 
