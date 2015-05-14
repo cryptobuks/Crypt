@@ -6,10 +6,14 @@ Webapp/fvserver/fvserver/settings.py
 *.pyc
 Webapp/fvserver/fvserver.db
 Build/Crypt.app
-Crypt.xcodeproj/project.xcworkspace/xcuserdata/grahamgilbert.xcuserdatad/UserInterfaceState.xcuserstate
 
 *.xcuserstate
 
 Crypt.xcodeproj/xcuserdata/abanks.xcuserdatad/xcschemes/Crypt.xcscheme
 
 Crypt.xcodeproj/xcuserdata/abanks.xcuserdatad/xcschemes/xcschememanagement.plist
+
+Build/Crypt.build
+
+Build/Release
+Crypt.xcodeproj/project.xcworkspace/xcuserdata/*

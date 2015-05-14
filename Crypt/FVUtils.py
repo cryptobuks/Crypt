@@ -130,7 +130,7 @@ def internet_on():
           NSLog(u"Server is accessible")
           return True
       except URLError as err: pass
-      NSLog(u"Server is not accessible")
+      NSLog(u"Server is not accessible. Couldn't access %@", pref('ServerURL'))
       return False
     else:
       return True
@@ -151,32 +151,40 @@ def escrow_key(key, username, runtype):
     macname = GetMacName()
     mydata=[('serial',serial),('recovery_password',key),('username',username),('macname',macname)]
     mydata=urllib.urlencode(mydata)
-    req = Request(theurl, mydata)
-    try:
-        response = urlopen(req)
-    except URLError, e:
-        if hasattr(e, 'reason'):
-            print 'We failed to reach a server.'
-            print 'Reason: ', e.reason
-            has_error = True
-        elif hasattr(e, 'code'):
-            print 'The server couldn\'t fulfill the request'
-            print 'Error code: ', e.code
-            has_error = True
-        if has_error:
-            plistData = {}
-            plistData['recovery_key']=key
-            plistData['username']=username
-            try:
-                FoundationPlist.writePlist(plistData, '/private/var/root/recovery_key.plist')
-            except:
-                os.makedirs('/usr/local/crypt')
-                FoundationPlist.writePlist(plistData, '/private/var/root/recovery_key.plist')
+    # req = Request(theurl, mydata)
+    # try:
+    #     response = urlopen(req)
+    # except URLError, e:
+    #     if hasattr(e, 'reason'):
+    #         print 'We failed to reach a server.'
+    #         print 'Reason: ', e.reason
+    #         has_error = True
+    #     elif hasattr(e, 'code'):
+    #         print 'The server couldn\'t fulfill the request'
+    #         print 'Error code: ', e.code
+    #         has_error = True
+    cmd = ['/usr/bin/curl', '-fsSL', '--data', mydata, theurl]
+    task = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = task.communicate()[0]
 
-            os.chmod('/private/var/root/recovery_key.plist',0700)
-            if runtype=="initial":
-                the_command = "/sbin/reboot"
-                reboot = subprocess.Popen(the_command,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).communicate()[0]
+    if task.returncode != 0:
+        has_error = True
+    else:
+        has_error = False
+    if has_error:
+        plistData = {}
+        plistData['recovery_key']=key
+        plistData['username']=username
+        try:
+            FoundationPlist.writePlist(plistData, '/private/var/root/recovery_key.plist')
+        except:
+            os.makedirs('/usr/local/crypt')
+            FoundationPlist.writePlist(plistData, '/private/var/root/recovery_key.plist')
+
+        os.chmod('/private/var/root/recovery_key.plist',0700)
+        if runtype=="initial":
+            the_command = "/sbin/reboot"
+            reboot = subprocess.Popen(the_command,shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE).communicate()[0]
 
     else:
         ##need some code to read in the json response from the server, and if the data matches, display success message, or failiure message, then reboot. If not, we need to cache it on disk somewhere - maybe pull it out with facter?
