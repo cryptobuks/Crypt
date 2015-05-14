@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>6D5728DF-12C8-4CF0-B52C-A242307469DF</string>
+	<key>IDESourceControlProjectName</key>
+	<string>Crypt</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>AE1DA373EB83327BCFA5ED97EA572B98BBB6653A</key>
+		<string>https://github.com/grahamgilbert/crypt</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Crypt.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>AE1DA373EB83327BCFA5ED97EA572B98BBB6653A</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/grahamgilbert/crypt</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>AE1DA373EB83327BCFA5ED97EA572B98BBB6653A</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>AE1DA373EB83327BCFA5ED97EA572B98BBB6653A</string>
+			<key>IDESourceControlWCCName</key>
+			<string>crypt</string>
+		</dict>
+	</array>
+</dict>
+</plist>
