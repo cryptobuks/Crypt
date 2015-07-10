@@ -46,14 +46,14 @@ class FVController(NSObject):
     progressPanel = objc.IBOutlet()
     progressIndicator = objc.IBOutlet()
     progressText = objc.IBOutlet()
-    
-    
+    autoUsername = None
+
     def startRun(self):
         if self.window:
             self.window.setCanBecomeVisibleWithoutLogin_(True)
             self.window.setLevel_(NSScreenSaverWindowLevel - 1)
             self.window.center()
-            
+
     def runEncryptOnThread_(self, input_plist):
         # Autorelease pool for memory management
         pool = NSAutoreleasePool.alloc().init()
@@ -73,12 +73,12 @@ class FVController(NSObject):
         if p.returncode != 0:
             NSLog('ERROR: %s' % err)
             the_error = err
-            
+
         self.performSelectorOnMainThread_withObject_waitUntilDone_(self.encryptionComplete(user_name, recovery_key, the_error), None, YES)
         # Clean up autorelease pool
         del pool
 
-        
+
     def encryptionComplete(self, user_name, recovery_key, encrypt_error):
         # end the modal sheet and close the panel
         NSApp.endSheet_(self.progressPanel)
@@ -115,7 +115,7 @@ class FVController(NSObject):
             the_settings['Password'] = password
             input_plist = plistlib.writePlistToString(the_settings)
             NSThread.detachNewThreadSelector_toTarget_withObject_(self.runEncryptOnThread_, self, input_plist)
-            
+
         if not os.path.exists('/usr/bin/fdesetup'):
             return fv_status, the_error
 
@@ -126,7 +126,7 @@ class FVController(NSObject):
             self.progressIndicator.startAnimation_(self)
         ##submit this to the server fv_status['recovery_password']
         FVUtils.escrow_key(key, username, runtype)
-    
+
     def errorReset(self):
         # Hide the progress bar
         NSApp.endSheet_(self.progressPanel)
@@ -146,9 +146,13 @@ class FVController(NSObject):
                                                                                      self.window, self, enable_inputs(self), objc.nil)
 
     def awakeFromNib(self):
-        cur_console = SCDynamicStoreCopyConsoleUser(None, None, None)[0]
-        if cur_console != "":
-            self.userName.setStringValue_(cur_console)
+        try:
+            cur_console = SCDynamicStoreCopyConsoleUser(None, None, None)[0]
+            if cur_console != "":
+                self.autoUsername = True
+                self.userName.setStringValue_(cur_console)
+        except:
+            self.autoUsername = False
 
     @objc.IBAction
     def encrypt_(self,sender):
@@ -166,13 +170,17 @@ class FVController(NSObject):
         self.userName.setEnabled_(False)
         self.password.setEnabled_(False)
         self.encryptButton.setEnabled_(False)
-        
+
         def enable_inputs(self):
+            if self.autoUsername == False:
+                self.username.setEnabled_(True)
             self.password.setEnabled_(True)
             self.encryptButton.setEnabled_(True)
-    
+
         if username_value == "" or password_value == "":
             self.errorField.setStringValue_("You need to enter your username and password")
+            if self.autoUsername == False:
+                self.username.setEnabled_(True)
             self.password.setEnabled_(True)
             self.encryptButton.setEnabled_(True)
 
@@ -180,7 +188,7 @@ class FVController(NSObject):
             self.userName.setEnabled_(False)
             self.password.setEnabled_(False)
             self.encryptButton.setEnabled_(False)
-            
+
             # Open the progress sheet
             NSApp.beginSheet_modalForWindow_modalDelegate_didEndSelector_contextInfo_(self.progressPanel, self.window, self, None, None)
             self.progressIndicator.startAnimation_(self)

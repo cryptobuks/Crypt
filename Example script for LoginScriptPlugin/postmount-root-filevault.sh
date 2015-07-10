@@ -39,9 +39,17 @@ check_encryption_state() {
 # Replace YOUR_LOCAL_ADMIN_ACCOUNT here if you want to allow such accounts to bypass this check.
 main() {
   check_encryption_state
+  LIST_OF_USERS=`dscl . -list /Users`
+  for USER in $LIST_OF_USERS; do
+        USER_ID=`dscl . -read /Users/$USER UniqueID | awk '{print $2}'`
 
-  if [[ $1 == "root" || $1 == "YOUR_LOCAL_ADMIN_ACCOUNT" ]]; then
-    log "Exiting Crypt hook for $1 logging in."
+        if [ $1 == $USER_ID ]
+           then
+             break  # Skip entire rest of loop.
+           fi
+    done
+  if [[ $USER == "root" || $USER == "admin" || $USER == "vagrant" ]]; then
+    log "Exiting Crypt hook for $USER logging in."
     exit 0
   fi
 

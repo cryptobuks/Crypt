@@ -17,3 +17,7 @@ Build/Crypt.build
 
 Build/Release
 Crypt.xcodeproj/project.xcworkspace/xcuserdata/*
+
+*.pkg
+
+*.pkg

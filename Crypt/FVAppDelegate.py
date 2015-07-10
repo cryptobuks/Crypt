@@ -23,9 +23,33 @@
 from Foundation import *
 import FVUtils
 from AppKit import *
+import objc
 
 class FVAppDelegate(NSObject):
+    window = objc.IBOutlet()
+
     def applicationWillFinishLaunching_(self, sender):
+
+        #[self.panel setCanBecomeVisibleWithoutLogin:YES];
+        self.window.setCanBecomeVisibleWithoutLogin_(True)
+        # // Our application is a UI element which never activates, so we want our
+        # // panel to show regardless.
+
+        #self.panel setHidesOnDeactivate:NO];
+        self.window.setHidesOnDeactivate_(False)
+
+        # // Due to a problem with the relationship between the UI frameworks and the
+        # // window server <rdar://problem/5136400>, -[NSWindow orderFront:] is not
+        # // sufficient to show the window.  We have to use -[NSWindow orderFrontRegardless].
+
+        # if ([[NSUserDefaults standardUserDefaults] boolForKey:@"ForceOrderFront"]) {
+        #     [[LogManager sharedManager] logWithFormat:@"Showing window with extreme prejudice"];
+        #     [self.panel orderFrontRegardless];
+        # } else {
+        #     [[LogManager sharedManager] logWithFormat:@"Showing window normally"];
+        #     [self.panel orderFront:self];
+        # }
+        self.window.makeKeyAndOrderFront_(self)
         # don't show menu bar
         NSMenu.setMenuBarVisible_(NO)
 
