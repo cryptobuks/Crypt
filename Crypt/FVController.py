@@ -172,15 +172,19 @@ class FVController(NSObject):
         self.encryptButton.setEnabled_(False)
 
         def enable_inputs(self):
-            if self.autoUsername == False:
-                self.username.setEnabled_(True)
+            if self.autoUsername == True:
+                self.userName.setEnabled_(False)
+            else:
+                self.userName.setEnabled_(True)
             self.password.setEnabled_(True)
             self.encryptButton.setEnabled_(True)
 
         if username_value == "" or password_value == "":
             self.errorField.setStringValue_("You need to enter your username and password")
-            if self.autoUsername == False:
-                self.username.setEnabled_(True)
+            if self.autoUsername == True:
+                self.userName.setEnabled_(False)
+            else:
+                self.userName.setEnabled_(True)
             self.password.setEnabled_(True)
             self.encryptButton.setEnabled_(True)
 
