@@ -72,7 +72,8 @@ def GetMacSerial():
                 SERIAL = cf.CFStringGetCStringPtr(serialNumberAsCFString, 0)
 
             iokit.IOObjectRelease(platformExpert)
-
+    # The slashes VMware puts in sometimes stuffs up the app
+    SERIAL = SERIAL.replace("/", "")
     return SERIAL
 
 
