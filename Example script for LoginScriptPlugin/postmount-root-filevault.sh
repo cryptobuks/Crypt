@@ -33,8 +33,7 @@ check_encryption_state() {
     log "Disk encrypting or decrypting, skipping."
     exit 0
   fi
-  ${DISKUTIL} list | grep -c Apple_Boot
-  if [[ ${?} -eq 0 ]]; then
+  if ! ${DISKUTIL} list | grep -c -q "Apple_Boot"  ; then
     log "Apple Recovery Partition does not exist, skipping."
     exit 0
   fi
