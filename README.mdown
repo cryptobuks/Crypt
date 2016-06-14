@@ -1,4 +1,5 @@
-#Crypt
+# **Crypt is deprecated. You should use [Crypt 2](https://github.com/grahamgilbert/crypt2) from now on.**
+
 Crypt is a system for centrally storing FileVault 2 recovery keys. It is made up of a client app, and a Django web app for storing the keys. You will also need to [download and install the webapp](https://github.com/grahamgilbert/Crypt-Server).
 
 ##Changes in this version
